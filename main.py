@@ -101,12 +101,14 @@ start_service(
 # Wait a moment for writer to initialize
 time.sleep(2)
 
-# Start Mock PLC Agent
+# Start Mock PLC Agent (CRITICAL - generates data)
 print("\n🤖 Starting Mock PLC Agent...")
+print("   ⚠️  This is REQUIRED for data generation!")
 start_service(
     "Mock PLC Agent",
     f"{PYTHON_CMD} mock_plc_agent/mock_plc_agent.py"
 )
+time.sleep(2)  # Wait for Mock PLC to connect
 
 # Start Frontend
 print("\n🌐 Starting Frontend...")
