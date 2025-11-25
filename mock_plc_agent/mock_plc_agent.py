@@ -247,12 +247,20 @@ try:
             client.publish(f"plc/{MACHINE_ID}/bottlefiller/counters", json.dumps(data["counters"]), qos=1)
             client.publish(f"plc/{MACHINE_ID}/bottlefiller/alarms", json.dumps(data["alarms"]), qos=1)
             
-            # Print status
-            print(f"⏰ {data['timestamp']} | "
-                  f"[{MACHINE_ID}] | "
-                  f"Bottles: {data['counters']['BottlesFilled']} | "
-                  f"Filling: {data['status']['Filling']} | "
-                  f"Level: {data['analog']['FillLevel']}%")
+            # Print detailed status with key metrics
+            print(f"📤 [{MACHINE_ID}] Published to MQTT:")
+            print(f"   ⏰ Time: {data['timestamp']}")
+            print(f"   📊 Production: {data['counters']['BottlesFilled']} bottles | "
+                  f"{data['counters']['BottlesPerMinute']:.1f} bottles/min | "
+                  f"{data['counters']['BottlesRejected']} rejected")
+            print(f"   🔧 Status: Running={data['status']['SystemRunning']} | "
+                  f"Filling={data['status']['Filling']} | "
+                  f"Fault={data['status']['Fault']}")
+            print(f"   📈 Levels: Fill={data['analog']['FillLevel']:.1f}% | "
+                  f"Temp={data['analog']['TankTemperature']:.1f}°C | "
+                  f"Pressure={data['analog']['TankPressure']:.1f} PSI")
+            print(f"   📡 Topic: {topic_full}")
+            print()
         except Exception as e:
             print(f"⚠️  Error publishing: {e}")
             connected = False
