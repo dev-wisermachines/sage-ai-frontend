@@ -3,3 +3,10 @@ language = "python3"
 [deploy]
 run = ["python3", "main.py"]
 
+[run]
+command = "python3 main.py"
+
+[packager]
+language = "python3"
+ignoredPackages = ["unit_tests"]
+
