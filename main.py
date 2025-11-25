@@ -22,24 +22,33 @@ def start_service(name, command, cwd=None):
     print(f"🚀 Starting {name}...")
     env = os.environ.copy()
     
+    # Open log file for this service
+    log_file = open(f"/tmp/{name.lower().replace(' ', '_')}.log", "w")
+    
     process = subprocess.Popen(
         command,
         shell=True,
         cwd=cwd,
         env=env,
-        stdout=subprocess.PIPE,
+        stdout=log_file,
         stderr=subprocess.STDOUT,
         text=True,
         bufsize=1
     )
-    processes.append((name, process))
+    processes.append((name, process, log_file))
     print(f"✅ {name} started (PID: {process.pid})")
+    print(f"   📝 Logs: /tmp/{name.lower().replace(' ', '_')}.log")
     return process
 
 def cleanup():
     """Stop all processes"""
     print("\n🛑 Stopping all services...")
-    for name, process in processes:
+    for item in processes:
+        if len(item) == 3:
+            name, process, log_file = item
+            log_file.close()
+        else:
+            name, process = item
         try:
             process.terminate()
             process.wait(timeout=5)
@@ -95,7 +104,11 @@ print("\n" + "=" * 60)
 print("✅ All services started!")
 print("=" * 60)
 print("\n📊 Services Status:")
-for name, process in processes:
+for item in processes:
+    if len(item) == 3:
+        name, process, _ = item
+    else:
+        name, process = item
     status = "🟢 Running" if process.poll() is None else "🔴 Stopped"
     print(f"   {status} - {name}")
 
@@ -108,10 +121,26 @@ try:
     while True:
         time.sleep(5)
         # Check if any process died
-        for name, process in processes:
+        for item in processes:
+            if len(item) == 3:
+                name, process, log_file = item
+            else:
+                name, process = item
             if process.poll() is not None:
                 exit_code = process.returncode
                 print(f"\n⚠️ {name} stopped unexpectedly (exit code: {exit_code})")
+                # Show last few lines of log
+                log_path = f"/tmp/{name.lower().replace(' ', '_')}.log"
+                if os.path.exists(log_path):
+                    try:
+                        with open(log_path, 'r') as f:
+                            lines = f.readlines()
+                            if lines:
+                                print(f"   Last log lines:")
+                                for line in lines[-3:]:
+                                    print(f"   {line.rstrip()}")
+                    except:
+                        pass
                 # Try to restart
                 print(f"🔄 Attempting to restart {name}...")
                 if name == "InfluxDB Writer":
