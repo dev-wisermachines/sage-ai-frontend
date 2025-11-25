@@ -112,7 +112,7 @@ start_service(
 print("\n🌐 Starting Frontend...")
 start_service(
     "Frontend",
-    "npm run dev",
+    "npm run dev -- -H 0.0.0.0",
     cwd="frontend"
 )
 
