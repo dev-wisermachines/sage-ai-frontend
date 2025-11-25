@@ -163,7 +163,11 @@ if MQTT_USERNAME and MQTT_PASSWORD:
 
 if MQTT_TLS_ENABLED:
     print(f"🔐 Configuring TLS connection...")
-    if CA_CERT_PATH and os.path.exists(CA_CERT_PATH):
+    # Check if connecting to cloud broker (HiveMQ Cloud, etc.)
+    is_cloud_broker = "hivemq.cloud" in MQTT_BROKER.lower() or "cloud" in MQTT_BROKER.lower()
+    
+    if CA_CERT_PATH and os.path.exists(CA_CERT_PATH) and not is_cloud_broker:
+        # Use CA cert for local/self-hosted brokers
         client.tls_set(
             ca_certs=CA_CERT_PATH,
             certfile=CLIENT_CERT_PATH if CLIENT_CERT_PATH and os.path.exists(CLIENT_CERT_PATH) else None,
@@ -177,7 +181,11 @@ if MQTT_TLS_ENABLED:
             print(f"   ⚠️  Hostname verification disabled (for testing only)")
         print(f"   ✅ TLS configured with CA cert: {CA_CERT_PATH}")
     else:
-        print(f"   ⚠️  CA cert not found, running without TLS verification (for cloud MQTT)")
+        # For cloud brokers, disable certificate verification
+        if is_cloud_broker:
+            print(f"   ℹ️  Cloud MQTT broker detected, disabling certificate verification")
+        else:
+            print(f"   ⚠️  CA cert not found, running without TLS verification (for cloud MQTT)")
         client.tls_set(cert_reqs=ssl.CERT_NONE)
         client.tls_insecure_set(True)  # Disable certificate verification for cloud brokers
 
