@@ -22,6 +22,9 @@ from mock_plc_agent.config import (
     CONVEYOR_SPEED_DEFAULT, TOLERANCE_DEFAULT
 )
 
+# Store MQTT_BROKER for TLS detection
+_MQTT_BROKER_HOST = MQTT_BROKER
+
 # Machine ID - identifies which machine this agent represents
 MACHINE_ID = os.getenv("MACHINE_ID", "machine-01")
 
@@ -164,7 +167,7 @@ if MQTT_USERNAME and MQTT_PASSWORD:
 if MQTT_TLS_ENABLED:
     print(f"🔐 Configuring TLS connection...")
     # Check if connecting to cloud broker (HiveMQ Cloud, etc.)
-    is_cloud_broker = "hivemq.cloud" in MQTT_BROKER.lower() or "cloud" in MQTT_BROKER.lower()
+    is_cloud_broker = "hivemq.cloud" in _MQTT_BROKER_HOST.lower() or "cloud" in _MQTT_BROKER_HOST.lower()
     
     if CA_CERT_PATH and os.path.exists(CA_CERT_PATH) and not is_cloud_broker:
         # Use CA cert for local/self-hosted brokers
