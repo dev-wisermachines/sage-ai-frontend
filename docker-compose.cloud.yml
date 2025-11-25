@@ -14,9 +14,9 @@ services:
       - ./mosquitto/data:/mosquitto/data
       - ./mosquitto/log:/mosquitto/log
     restart: unless-stopped
-    command: mosquitto -c /mosquitto/config/mosquitto.production.conf
+    command: mosquitto -c /mosquitto/config/mosquitto.railway.conf
     environment:
-      - MQTT_PORT=${MQTT_PORT:-8883}
+      - MQTT_PORT=${MQTT_PORT:-1883}
 
   # InfluxDB
   influxdb:
@@ -60,7 +60,7 @@ services:
     container_name: influxdb-writer-cloud
     environment:
       - MQTT_BROKER_HOST=${MQTT_BROKER_HOST:-mosquitto}
-      - MQTT_BROKER_PORT=${MQTT_BROKER_PORT:-8883}
+      - MQTT_BROKER_PORT=${MQTT_BROKER_PORT:-1883}
       - MQTT_USERNAME=${MQTT_USERNAME:-influxdb_writer}
       - MQTT_PASSWORD=${MQTT_PASSWORD:-influxdb_writer_pass}
       - MQTT_TLS_ENABLED=${MQTT_TLS_ENABLED:-false}
@@ -82,7 +82,7 @@ services:
     container_name: mock-plc-cloud
     environment:
       - MQTT_BROKER_HOST=${MQTT_BROKER_HOST:-mosquitto}
-      - MQTT_BROKER_PORT=${MQTT_BROKER_PORT:-8883}
+      - MQTT_BROKER_PORT=${MQTT_BROKER_PORT:-1883}
       - MQTT_USERNAME=${MQTT_USERNAME:-edge_gateway}
       - MQTT_PASSWORD=${MQTT_PASSWORD:-edge_gateway_pass}
       - MQTT_TLS_ENABLED=${MQTT_TLS_ENABLED:-false}

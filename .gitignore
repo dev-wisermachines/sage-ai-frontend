@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.next/
+out/
+dist/
+
+# Logs
+*.log
+logs/
+mosquitto/log/*.log
+
+# Data directories
+influxdb/data/
+grafana/data/
+mosquitto/data/*.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Docker
+.docker/
+
+# Test files
+*.test
+coverage/
+
+# Large files
+*.pdf
+*.zip
+*.tar.gz
+
