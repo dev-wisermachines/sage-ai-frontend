@@ -7,11 +7,18 @@ from influxdb_client import InfluxDBClient
 import os
 from datetime import datetime, timedelta
 
+# Load .env file
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # dotenv not installed, skip
+
 # Configuration
 INFLUXDB_URL = os.getenv("INFLUXDB_URL", "http://localhost:8086")
 INFLUXDB_TOKEN = os.getenv("INFLUXDB_TOKEN", "my-super-secret-auth-token")
 INFLUXDB_ORG = os.getenv("INFLUXDB_ORG", "myorg")
-INFLUXDB_BUCKET = os.getenv("INFLUXDB_BUCKET", "plc_data")
+INFLUXDB_BUCKET = os.getenv("INFLUXDB_BUCKET", "plc_data_new")
 
 print("🔍 Checking InfluxDB for data...")
 print(f"   URL: {INFLUXDB_URL}")

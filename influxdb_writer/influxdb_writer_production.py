@@ -277,12 +277,12 @@ if MQTT_TLS_ENABLED:
             print(f"   ⚠️  Hostname verification disabled (for testing only)")
         print(f"   ✅ TLS configured with CA cert: {CA_CERT_PATH}")
     else:
-        # For cloud brokers, disable certificate verification
+        # For cloud brokers or when CA cert not found, disable certificate verification
         if is_cloud_broker:
             print(f"   ℹ️  Cloud MQTT broker detected, disabling certificate verification")
         else:
             print(f"   ⚠️  CA cert not found: {CA_CERT_PATH}")
-        print(f"   ⚠️  Running without TLS verification (for cloud MQTT)")
+            print(f"   ⚠️  Running without TLS verification (for cloud MQTT)")
         mqtt_client.tls_set(cert_reqs=ssl.CERT_NONE)
         mqtt_client.tls_insecure_set(True)  # Disable certificate verification for cloud brokers
 
