@@ -28,6 +28,11 @@ _MQTT_BROKER_HOST = MQTT_BROKER
 # Machine ID - identifies which machine this agent represents
 MACHINE_ID = os.getenv("MACHINE_ID", "machine-01")
 
+# Debug/Output options
+PRINT_JSON_DATA = os.getenv("PRINT_JSON_DATA", "false").lower() == "true"
+SAVE_JSON_DATA = os.getenv("SAVE_JSON_DATA", "false").lower() == "true"
+JSON_OUTPUT_FILE = os.getenv("JSON_OUTPUT_FILE", f"/tmp/mock_plc_data_{MACHINE_ID}.json")
+
 # Bottle Filler Tag States
 class BottleFillerTags:
     def __init__(self):
@@ -260,6 +265,44 @@ try:
                   f"Temp={data['analog']['TankTemperature']:.1f}°C | "
                   f"Pressure={data['analog']['TankPressure']:.1f} PSI")
             print(f"   📡 Topic: {topic_full}")
+            
+            # Print full JSON if enabled
+            if PRINT_JSON_DATA:
+                print(f"\n📄 Full JSON Data:")
+                print("=" * 60)
+                print(payload)
+                print("=" * 60)
+            
+            # Save to JSON file if enabled
+            if SAVE_JSON_DATA:
+                try:
+                    # Read existing data if file exists
+                    json_data = []
+                    if os.path.exists(JSON_OUTPUT_FILE):
+                        try:
+                            with open(JSON_OUTPUT_FILE, 'r') as f:
+                                json_data = json.load(f)
+                                if not isinstance(json_data, list):
+                                    json_data = [json_data]
+                        except (json.JSONDecodeError, ValueError):
+                            json_data = []
+                    
+                    # Append new data with timestamp
+                    json_data.append({
+                        "timestamp": data['timestamp'],
+                        "machine_id": MACHINE_ID,
+                        "topic": topic_full,
+                        "data": data
+                    })
+                    
+                    # Write back to file
+                    with open(JSON_OUTPUT_FILE, 'w') as f:
+                        json.dump(json_data, f, indent=2)
+                    
+                    print(f"💾 Saved to: {JSON_OUTPUT_FILE} ({len(json_data)} entries)")
+                except Exception as e:
+                    print(f"⚠️  Error saving JSON: {e}")
+            
             print()
         except Exception as e:
             print(f"⚠️  Error publishing: {e}")
