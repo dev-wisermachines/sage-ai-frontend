@@ -46,13 +46,18 @@ INFLUXDB_BUCKET = os.getenv("INFLUXDB_BUCKET", "plc_data_new")
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
         print(f"✅ Connected to MQTT broker")
-        client.subscribe(MQTT_TOPIC)
-        print(f"📡 Subscribed to: {MQTT_TOPIC} (multi-machine support)\n")
+        client.subscribe(MQTT_TOPIC)  # Bottlefiller topics
+        client.subscribe("plc/+/lathe/data")  # Lathe topics
+        print(f"📡 Subscribed to: {MQTT_TOPIC} (bottlefiller)")
+        print(f"📡 Subscribed to: plc/+/lathe/data (lathe)\n")
     else:
         print(f"❌ Failed to connect to MQTT broker, return code {rc}")
 
 def on_message(client, userdata, msg):
     try:
+        # Debug: Print ALL received messages
+        print(f"📨 Received message on topic: {msg.topic} (Machine: {msg.topic.split('/')[1] if len(msg.topic.split('/')) > 1 else 'unknown'})")
+        
         # Parse JSON message
         data = json.loads(msg.payload.decode())
         
@@ -76,7 +81,8 @@ def on_message(client, userdata, msg):
             
             # Create InfluxDB point with basic fields and machine_id tag
             point = Point("plc_data") \
-                .tag("machine_id", machine_id)
+                .tag("machine_id", machine_id) \
+                .tag("machine_type", "bottlefiller")
             
             # Add optional tags if available
             if line_id:
@@ -141,7 +147,8 @@ def on_message(client, userdata, msg):
             # Tier 1: Critical Status, Counters, Alarms
             # Tier 2: Important Analog and Inputs
             point = Point("plc_data") \
-                .tag("machine_id", machine_id)
+                .tag("machine_id", machine_id) \
+                .tag("machine_type", "bottlefiller")
             
             # Add optional tags if available
             if line_id:
@@ -181,6 +188,72 @@ def on_message(client, userdata, msg):
             
             point = point.time(timestamp)
             
+        elif "lathe" in msg.topic or "spindle" in data:
+            # Format from lathe_sim (CNC Lathe data)
+            # Extract machine_id from topic: "plc/lathe01/lathe/data"
+            print(f"🔧 Processing lathe data from topic: {msg.topic}")
+            machine_id = topic_parts[1] if len(topic_parts) > 1 else "unknown"
+            
+            # Extract lathe-specific data
+            safety = data.get("safety", {})
+            spindle = data.get("spindle", {})
+            axis_x = data.get("axis_x", {})
+            axis_z = data.get("axis_z", {})
+            production = data.get("production", {})
+            alarms = data.get("alarms", {})
+            status = data.get("status", {})
+            tooling = data.get("tooling", {})
+            coolant = data.get("coolant", {})
+            
+            # Create InfluxDB point for lathe with machine_type tag
+            point = Point("plc_data") \
+                .tag("machine_id", machine_id) \
+                .tag("machine_type", "lathe") \
+                .field("DoorClosed", bool(safety.get("door_closed", False))) \
+                .field("EStopOK", bool(safety.get("estop_ok", False))) \
+                .field("SpindleSpeed", float(spindle.get("speed_actual", 0.0))) \
+                .field("SpindleSpeedSetpoint", float(spindle.get("speed_setpoint", 0.0))) \
+                .field("SpindleLoad", float(spindle.get("load_percent", 0.0))) \
+                .field("AxisXPosition", float(axis_x.get("position", 0.0))) \
+                .field("AxisXFeedrate", float(axis_x.get("feedrate", 0.0))) \
+                .field("AxisXHomed", bool(axis_x.get("homed", False))) \
+                .field("AxisZPosition", float(axis_z.get("position", 0.0))) \
+                .field("AxisZFeedrate", float(axis_z.get("feedrate", 0.0))) \
+                .field("AxisZHomed", bool(axis_z.get("homed", False))) \
+                .field("CycleTime", float(production.get("cycle_time_seconds", 0.0))) \
+                .field("PartsCompleted", int(production.get("parts_completed", 0))) \
+                .field("PartsRejected", int(production.get("parts_rejected", 0))) \
+                .field("PartsPerHour", float(production.get("parts_per_hour", 0.0))) \
+                .field("AlarmSpindleOverload", bool(alarms.get("spindle_overload", False))) \
+                .field("AlarmChuckNotClamped", bool(alarms.get("chuck_not_clamped", False))) \
+                .field("AlarmDoorOpen", bool(alarms.get("door_open", False))) \
+                .field("AlarmToolWear", bool(alarms.get("tool_wear", False))) \
+                .field("AlarmCoolantLow", bool(alarms.get("coolant_low", False))) \
+                .field("SystemRunning", bool(status.get("system_running", False))) \
+                .field("Machining", bool(status.get("machining", False))) \
+                .field("Ready", bool(status.get("ready", False))) \
+                .field("Fault", bool(status.get("fault", False))) \
+                .field("AutoMode", bool(status.get("auto_mode", False))) \
+                .field("ToolNumber", int(tooling.get("tool_number", 0))) \
+                .field("ToolLifePercent", float(tooling.get("tool_life_percent", 0.0))) \
+                .field("ToolOffsetX", float(tooling.get("tool_offset_x", 0.0))) \
+                .field("ToolOffsetZ", float(tooling.get("tool_offset_z", 0.0))) \
+                .field("CoolantFlowRate", float(coolant.get("flow_rate", 0.0))) \
+                .field("CoolantTemperature", float(coolant.get("temperature", 0.0))) \
+                .field("CoolantLevelPercent", float(coolant.get("level_percent", 0.0)))
+            
+            # Parse timestamp (expecting UTC with timezone info)
+            timestamp_str = data.get("timestamp")
+            if timestamp_str:
+                try:
+                    timestamp = datetime.fromisoformat(timestamp_str.replace('Z', '+00:00'))
+                except (ValueError, AttributeError):
+                    timestamp = datetime.now(timezone.utc)
+            else:
+                timestamp = datetime.now(timezone.utc)
+            
+            point = point.time(timestamp)
+            
         else:
             print(f"⚠️  Unknown data format, skipping. Keys: {list(data.keys())[:5]}")
             return
@@ -197,6 +270,7 @@ def on_message(client, userdata, msg):
             
             # Print detailed summary of what was written
             if "counters" in data:
+                # Bottlefiller data
                 bottles_per_min = counters.get("BottlesPerMinute", 0.0)
                 print(f"💾 Written to InfluxDB [{machine_id}]:")
                 print(f"   📊 Production: {bottles_filled} bottles | "
@@ -208,6 +282,22 @@ def on_message(client, userdata, msg):
                       f"Temp: {tank_temperature:.1f}°C")
                 print(f"   ⚠️  Alarms: Fault={alarm_fault} | "
                       f"Overfill={alarm_overfill} | Underfill={alarm_underfill}")
+                print()
+            elif "lathe" in msg.topic or "spindle" in data:
+                # Lathe data - extract again for printing
+                lathe_safety = data.get("safety", {})
+                lathe_spindle = data.get("spindle", {})
+                lathe_axis_x = data.get("axis_x", {})
+                lathe_axis_z = data.get("axis_z", {})
+                lathe_production = data.get("production", {})
+                lathe_alarms = data.get("alarms", {})
+                lathe_status = data.get("status", {})
+                print(f"💾 Written to InfluxDB [{machine_id} - Lathe]:")
+                print(f"   ⚙️  Spindle: Speed={lathe_spindle.get('speed_actual', 0):.1f} RPM | Load={lathe_spindle.get('load_percent', 0):.1f}%")
+                print(f"   📍 Axis: X={lathe_axis_x.get('position', 0):.2f} mm | Z={lathe_axis_z.get('position', 0):.2f} mm")
+                print(f"   📊 Production: Parts={lathe_production.get('parts_completed', 0)} | Rate={lathe_production.get('parts_per_hour', 0):.1f}/hr | Cycle={lathe_production.get('cycle_time_seconds', 0):.1f}s")
+                print(f"   🔧 Status: Running={lathe_status.get('system_running', False)} | Machining={lathe_status.get('machining', False)} | Fault={lathe_status.get('fault', False)}")
+                print(f"   ⚠️  Alarms: SpindleOverload={lathe_alarms.get('spindle_overload', False)} | ChuckNotClamped={lathe_alarms.get('chuck_not_clamped', False)}")
                 print()
             else:
                 print(f"💾 Written [{machine_id}]: Bottles={bottle_count}, Speed={filler_speed:.2f}, Running={line_running}")
