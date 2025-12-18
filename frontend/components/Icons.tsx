@@ -229,3 +229,32 @@ export const LoadIcon = ({ className = "w-4 h-4", size }: IconProps) => (
   </svg>
 );
 
+export const ShopfloorsIcon = ({ className = "w-6 h-6", size }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" className={className} width={size} height={size} xmlns="http://www.w3.org/2000/svg">
+    {/* Factory/warehouse building with multiple floors */}
+    <path d="M3 21h18v-2H3v2z" fill="currentColor" opacity="0.6"/>
+    <path d="M3 19V7h18v12H3z" fill="currentColor" opacity="0.3"/>
+    {/* Floor dividers */}
+    <path d="M3 13h18v-1H3v1z" fill="currentColor" opacity="0.4"/>
+    <path d="M3 10h18v-1H3v1z" fill="currentColor" opacity="0.4"/>
+    {/* Windows/panels on each floor */}
+    <rect x="5" y="8" width="3" height="2" rx="0.5" fill="currentColor" opacity="0.7"/>
+    <rect x="10" y="8" width="3" height="2" rx="0.5" fill="currentColor" opacity="0.7"/>
+    <rect x="15" y="8" width="3" height="2" rx="0.5" fill="currentColor" opacity="0.7"/>
+    <rect x="5" y="11" width="3" height="2" rx="0.5" fill="currentColor" opacity="0.7"/>
+    <rect x="10" y="11" width="3" height="2" rx="0.5" fill="currentColor" opacity="0.7"/>
+    <rect x="15" y="11" width="3" height="2" rx="0.5" fill="currentColor" opacity="0.7"/>
+    <rect x="5" y="14" width="3" height="2" rx="0.5" fill="currentColor" opacity="0.7"/>
+    <rect x="10" y="14" width="3" height="2" rx="0.5" fill="currentColor" opacity="0.7"/>
+    <rect x="15" y="14" width="3" height="2" rx="0.5" fill="currentColor" opacity="0.7"/>
+    {/* Entrance/door */}
+    <rect x="10" y="17" width="4" height="4" rx="0.5" fill="currentColor" opacity="0.8"/>
+  </svg>
+);
+
+export const PlusIcon = ({ className = "w-4 h-4", size }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" className={className} width={size} height={size} xmlns="http://www.w3.org/2000/svg">
+    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+  </svg>
+);
+
