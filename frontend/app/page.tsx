@@ -53,7 +53,7 @@ export default function Dashboard() {
         {/* Analytics Heading */}
         <div className="flex items-center gap-3 mb-4">
           <ChartIcon className="w-8 h-8 text-sage-400" />
-          <h1 className="heading-inter heading-inter-lg">AI-Powered Analytics</h1>
+          <h1 className="heading-inter heading-inter-lg">AI Analytics</h1>
         </div>
         
         {/* Machine Type and Selection */}

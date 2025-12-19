@@ -1,8 +1,17 @@
 'use client';
 
 import { ShopfloorsIcon, PlusIcon } from '@/components/Icons';
+import { MachineForm } from '@/components/MachineForm';
+import { useState } from 'react';
 
 export default function ShopfloorsPage() {
+  const [isMachineFormOpen, setIsMachineFormOpen] = useState(false);
+
+  const handleMachineCreated = () => {
+    setIsMachineFormOpen(false);
+    // Optionally refresh data here if needed
+  };
+
   return (
     <div className="bg-dark-bg text-dark-text p-6 min-h-screen">
       <div className="mb-6">
@@ -12,6 +21,7 @@ export default function ShopfloorsPage() {
             <h1 className="heading-inter heading-inter-lg">Equipments</h1>
           </div>
           <button
+            onClick={() => setIsMachineFormOpen(true)}
             className="bg-midnight-300 hover:bg-midnight-400 text-dark-text border border-dark-border p-2 rounded transition-colors flex items-center justify-center"
             title="Add Equipment"
           >
@@ -27,6 +37,13 @@ export default function ShopfloorsPage() {
           <p className="text-sm">Content coming soon...</p>
         </div>
       </div>
+
+      {/* Machine Form Modal */}
+      <MachineForm 
+        isOpen={isMachineFormOpen} 
+        onClose={() => setIsMachineFormOpen(false)} 
+        onSuccess={handleMachineCreated}
+      />
     </div>
   );
 }
