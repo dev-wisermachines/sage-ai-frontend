@@ -3,7 +3,7 @@
  * Checks saved workflows every minute and executes them when scheduled time arrives
  */
 
-import cron from 'node-cron';
+import * as cron from 'node-cron';
 import { readdir, readFile, writeFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';

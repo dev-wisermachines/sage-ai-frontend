@@ -40,8 +40,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate and process schedule
-    let processedSchedule = {
-      type: 'none' as 'deferred' | 'recurring' | 'none',
+    let processedSchedule: {
+      type: 'deferred' | 'recurring' | 'none';
+      enabled: boolean;
+      executeAt?: string;
+      interval?: string;
+    } = {
+      type: 'none',
       enabled: false,
     };
 
