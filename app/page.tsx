@@ -7,7 +7,7 @@ import { AlarmHistory } from '@/components/AlarmHistory';
 import { AlarmEvents } from '@/components/AlarmEvents';
 import { DowntimeStats } from '@/components/DowntimeStats';
 import { WorkOrderForm } from '@/components/WorkOrderForm';
-import { RefreshIcon, ChartIcon } from '@/components/Icons';
+import { RefreshIcon, SignalIcon } from '@/components/Icons';
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
@@ -217,7 +217,7 @@ export default function Dashboard() {
       <div className="mb-6">
         {/* Analytics Heading */}
         <div className="flex items-center gap-3 mb-4">
-          <ChartIcon className="w-8 h-8 text-sage-400" />
+          <SignalIcon className="w-6 h-6 text-sage-400" />
           <h1 className="heading-inter heading-inter-lg">Monitoring</h1>
         </div>
         

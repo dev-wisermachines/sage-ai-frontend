@@ -179,14 +179,12 @@ export default function ShopfloorsPage() {
         </div>
 
         {/* Lab/Shopfloor Dropdown */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Select Shopfloor/Lab
-          </label>
+        <div className="flex items-center gap-4 mt-4">
+          <label className="text-gray-400">Shopfloor/Lab:</label>
           <select
             value={selectedLabId}
             onChange={handleLabChange}
-            className="bg-dark-panel border border-dark-border rounded px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sage-500 focus:border-sage-500 min-w-[300px]"
+            className="bg-dark-panel border border-dark-border rounded px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sage-500 focus:border-sage-500 min-w-[200px]"
             disabled={loading || labs.length === 0}
           >
             <option value="">

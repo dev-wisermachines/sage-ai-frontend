@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { DashboardIcon, ChatIcon, CalendarIcon, AlarmEventsIcon, WorkflowIcon, ShopfloorsIcon, SignOutIcon } from './Icons';
+import { DashboardIcon, ChatIcon, CalendarIcon, NotificationIcon, WorkflowIcon, ShopfloorsIcon, SignOutIcon, SignalIcon, ChartIcon } from './Icons';
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -18,12 +18,17 @@ export function Sidebar() {
 
   const navItems = [
     {
-      name: 'Dashboard',
+      name: 'Monitoring',
       href: '/',
-      icon: <DashboardIcon className="w-6 h-6" />,
+      icon: <SignalIcon className="w-6 h-6" />,
     },
     {
-      name: 'Chat Assistant',
+      name: 'AI Insights',
+      href: '/ai-insights',
+      icon: <ChartIcon className="w-6 h-6" />,
+    },
+    {
+      name: 'AI Library',
       href: '/chat',
       icon: <ChatIcon className="w-6 h-6" />,
     },
@@ -38,9 +43,9 @@ export function Sidebar() {
       icon: <ShopfloorsIcon className="w-6 h-6" />,
     },
     {
-      name: 'Events',
+      name: 'Notifications',
       href: '/alarm-events',
-      icon: <AlarmEventsIcon className="w-6 h-6" />,
+      icon: <NotificationIcon className="w-6 h-6" />,
     },
     {
       name: 'Workflows',
