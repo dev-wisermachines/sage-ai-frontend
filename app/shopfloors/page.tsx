@@ -38,7 +38,7 @@ export default function ShopfloorsPage() {
   const [machines, setMachines] = useState<Machine[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
-  const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [viewMode, setViewMode] = useState<ViewMode>('cards');
 
   // Check if user is logged in and get user data
   useEffect(() => {
