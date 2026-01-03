@@ -115,10 +115,14 @@ export default function Dashboard() {
 
       if (data.success) {
         setLabs(data.labs || []);
-        // Auto-select first lab if available
+        // Auto-select Dawlance lab if available, otherwise first lab
         if (data.labs && data.labs.length > 0) {
-          setSelectedLabId(data.labs[0]._id);
-          fetchMachinesForLab(data.labs[0]._id);
+          const dawlanceLab = data.labs.find((lab: Lab) => 
+            lab.name.toLowerCase().includes('dawlance')
+          );
+          const labToSelect = dawlanceLab || data.labs[0];
+          setSelectedLabId(labToSelect._id);
+          fetchMachinesForLab(labToSelect._id);
         } else {
           console.warn('[Dashboard] No labs found for user');
           toast.warning('No labs found for your account');
