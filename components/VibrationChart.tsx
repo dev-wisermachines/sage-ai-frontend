@@ -56,11 +56,11 @@ export function VibrationChart({
     }
   };
   // Default to showing all three vibration axes
-  const [selectedAxes, setSelectedAxes] = useState<VibrationAxis[]>(['vibration', 'x_vibration', 'y_vibration']);
+  const [selectedAxes, setSelectedAxes] = useState<VibrationAxis[]>(['z_acc', 'x_acc', 'y_acc']);
   
   // Convert selected range to API format and adjust aggregation window
   const apiTimeRange = `-${selectedTimeRange}`;
-  const windowPeriod = selectedTimeRange === '24h' ? '5m' : selectedTimeRange === '7d' ? '30m' : '2h';
+  const windowPeriod = selectedTimeRange === '24h' ? '1m' : selectedTimeRange === '7d' ? '30m' : '2h';
   
   // Fetch data for all selected axes
   const axisData = selectedAxes.map(axis => ({
