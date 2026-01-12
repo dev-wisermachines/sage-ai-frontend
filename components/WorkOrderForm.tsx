@@ -513,8 +513,8 @@ export function WorkOrderForm({
         if (thresholdData.shouldGenerateWorkOrder && thresholdData.exceededAlarms.length > 0) {
           alarmToUse = thresholdData.exceededAlarms[0];
         } else {
-          // No alarms exceeded - check downtime
-          console.log('[AI Auto Fill] No alarms exceeded, checking downtime...');
+          // No alarms exceeded - check downtime incidents
+          console.log('[AI Auto Fill] No alarms exceeded, checking downtime incidents...');
           const downtimeResponse = await fetch(`/api/influxdb/downtime?machineId=${machineId}&timeRange=-7d`);
           
           if (downtimeResponse.ok) {
@@ -522,19 +522,21 @@ export function WorkOrderForm({
             if (downtimeData.data) {
               const downtimePercentage = downtimeData.data.downtimePercentage || 0;
               const incidentCount = downtimeData.data.incidentCount || 0;
+              const periods = downtimeData.data.periods || [];
               
               console.log(`[AI Auto Fill] Downtime: ${downtimePercentage.toFixed(2)}%, Incidents: ${incidentCount}`);
               
-              // If downtime is critical, assume vibration-related issues
-              if (downtimePercentage >= CRITICAL_DOWNTIME_THRESHOLD && incidentCount > 0) {
-                console.log(`[AI Auto Fill] Critical downtime detected (${downtimePercentage.toFixed(2)}%), using vibration documents`);
+              // If there are ANY downtime incidents, assume motor vibration issue
+              if (incidentCount > 0) {
+                console.log(`[AI Auto Fill] Downtime incidents detected (${incidentCount} incidents, ${downtimePercentage.toFixed(2)}% downtime), assuming motor vibration issue`);
                 documentType = 'vibration';
                 issueType = 'vibration';
-                alarmToUse = `Vibration-Related Downtime (${downtimePercentage.toFixed(1)}% downtime, ${incidentCount} incidents)`;
+                alarmToUse = `Motor Vibration Issue - ${incidentCount} downtime incident${incidentCount > 1 ? 's' : ''} (${downtimePercentage.toFixed(1)}% downtime)`;
+                toast.info(`Detected ${incidentCount} downtime incident${incidentCount > 1 ? 's' : ''}. Assuming motor vibration issue and filling form accordingly.`);
               } else {
-                // No threshold breached and no critical downtime
-                setPineconeInfo(`No alarms exceeded threshold and downtime is normal (${downtimePercentage.toFixed(1)}%). Please specify an alarm type or wait for issues to occur.`);
-                toast.info('No alarms exceeded threshold and downtime is normal. You can still use AI Auto Fill if you specify an alarm type.');
+                // No downtime incidents
+                setPineconeInfo(`No alarms exceeded threshold and no downtime incidents detected (${downtimePercentage.toFixed(1)}% downtime). Please specify an alarm type or wait for issues to occur.`);
+                toast.info('No alarms exceeded threshold and no downtime incidents. You can still use AI Auto Fill if you specify an alarm type.');
                 return;
               }
             } else {
