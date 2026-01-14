@@ -889,28 +889,22 @@ export function WorkOrderForm({
             )}
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={handleGetPineconeInfo}
-              disabled={loadingPinecone || !machineId}
-              className={`px-4 py-2 rounded text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
-                loadingPinecone
-                  ? 'bg-sage-500/10 border border-sage-500/20 text-sage-400/40 opacity-40 blur-[1px] cursor-not-allowed'
-                  : 'bg-sage-500/20 hover:bg-sage-500/30 border border-sage-500/40 text-sage-400 hover:text-sage-300 disabled:opacity-30 disabled:cursor-not-allowed disabled:blur-[0.5px]'
-              }`}
-              title={loadingPinecone ? "Filling form with AI-generated information..." : "AI Auto Fill - Automatically fill form fields from maintenance manual"}
-            >
-              {loadingPinecone ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-sage-400 border-t-transparent rounded-full animate-spin"></div>
-                  <span className="text-sage-400 animate-pulse">Gathering Info...</span>
-                </>
-              ) : (
-                <>
-                  <AIIcon className="w-4 h-4" />
-                  AI Auto Fill
-                </>
-              )}
-            </button>
+            {loadingPinecone ? (
+              <div className="flex items-center gap-2 text-sage-400 animate-pulse">
+                <div className="w-4 h-4 border-2 border-sage-400 border-t-transparent rounded-full animate-spin"></div>
+                <span className="font-medium">Gathering Info...</span>
+              </div>
+            ) : (
+              <button
+                onClick={handleGetPineconeInfo}
+                disabled={!machineId}
+                className="px-4 py-2 rounded text-sm font-medium transition-all duration-300 flex items-center gap-2 bg-sage-500/20 hover:bg-sage-500/30 border border-sage-500/40 text-sage-400 hover:text-sage-300 disabled:opacity-30 disabled:cursor-not-allowed disabled:blur-[0.5px]"
+                title="AI Auto Fill - Automatically fill form fields from maintenance manual"
+              >
+                <AIIcon className="w-4 h-4" />
+                AI Auto Fill
+              </button>
+            )}
             {alarmType && (
               <button
                 onClick={handleAutoFill}
