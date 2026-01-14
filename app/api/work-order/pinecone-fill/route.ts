@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
       // Also try maintenance_work_order but be more selective
       filter = {
         document_type: { $in: ['user_uploaded_document', 'maintenance_work_order'] }
-      };
+    };
       // Don't filter by machine type for vibration - vibration troubleshooting is often generic
       // This allows finding motor vibration docs even if they're not machine-type specific
     } else {
@@ -56,8 +56,8 @@ export async function POST(request: NextRequest) {
         document_type: { $eq: documentType }
       };
       // Filter by machine type if available for non-vibration issues
-      if (machineType) {
-        filter.machine_type = { $eq: machineType };
+    if (machineType) {
+      filter.machine_type = { $eq: machineType };
       }
     }
 
@@ -98,10 +98,10 @@ export async function POST(request: NextRequest) {
           });
         }
       } else {
-        return NextResponse.json({
-          success: false,
+      return NextResponse.json({
+        success: false,
           error: `No ${documentType} information found in Pinecone for this ${issueType === 'vibration' ? 'vibration issue' : 'alarm type'}.`,
-        });
+      });
       }
     }
 

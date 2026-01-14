@@ -187,9 +187,9 @@ export function WorkOrderForm({
         const machineName = machine.machineName || machineId;
         const machineIdFromDB = machine._id || machineId;
         const machineDescription = machine.description || '';
-        
-        setFormData(prev => ({
-          ...prev,
+      
+      setFormData(prev => ({
+        ...prev,
           // Machine context
           machineId: machineIdFromDB,
           machineType: machineType,
@@ -278,9 +278,9 @@ export function WorkOrderForm({
           // Final fallback: just update context fields
           setFormData(prev => ({
             ...prev,
-            machineId: machineId,
-            machineType: machineType,
-            alarmType: alarmType,
+        machineId: machineId,
+        machineType: machineType,
+        alarmType: alarmType,
             equipmentName: prev.equipmentName || '',
             equipmentNumber: prev.equipmentNumber || '',
             equipmentLocation: prev.equipmentLocation || '',
@@ -301,8 +301,8 @@ export function WorkOrderForm({
             workOrderNo: generatedWorkOrderNo,
             weekNo: weekNo.toString(),
             weekOf: weekOf,
-        }));
-      }
+      }));
+    }
     }
   }, [isOpen, machineId, machineType, alarmType, machineFromProps, shopfloorNameFromProps]);
 
@@ -489,28 +489,28 @@ export function WorkOrderForm({
       
       // Step 1: Check alarm thresholds (only if no alarmType is provided)
       if (!alarmType) {
-        const thresholdResponse = await fetch('/api/work-order/check-thresholds', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            machineId,
-            machineType,
-            timeRange: '-24h',
-            customThreshold: 50,
-          }),
-        });
+      const thresholdResponse = await fetch('/api/work-order/check-thresholds', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          machineId,
+          machineType,
+          timeRange: '-24h',
+          customThreshold: 50,
+        }),
+      });
 
-        if (!thresholdResponse.ok) {
+      if (!thresholdResponse.ok) {
           const errorData = await thresholdResponse.json().catch(() => ({}));
           throw new Error(errorData.error || 'Failed to check alarm thresholds');
-        }
+      }
 
-        const thresholdData = await thresholdResponse.json();
+      const thresholdData = await thresholdResponse.json();
 
         // If threshold breached, use the first exceeded alarm
-        if (thresholdData.shouldGenerateWorkOrder && thresholdData.exceededAlarms.length > 0) {
+      if (thresholdData.shouldGenerateWorkOrder && thresholdData.exceededAlarms.length > 0) {
           alarmToUse = thresholdData.exceededAlarms[0];
         } else {
           // No alarms exceeded - check downtime incidents
@@ -554,7 +554,7 @@ export function WorkOrderForm({
         }
       }
 
-      // Update alarmType in form data
+        // Update alarmType in form data
       if (alarmToUse) {
         setFormData(prev => ({
           ...prev,
@@ -564,20 +564,20 @@ export function WorkOrderForm({
       }
 
       // Step 2: Query Pinecone and auto-fill
-      const fillStartTime = Date.now();
-      const fillResponse = await fetch('/api/work-order/pinecone-fill', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          machineId,
-          alarmType: alarmToUse,
-          machineType,
+        const fillStartTime = Date.now();
+        const fillResponse = await fetch('/api/work-order/pinecone-fill', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            machineId,
+            alarmType: alarmToUse,
+            machineType,
           documentType,
           issueType,
-        }),
-      });
+          }),
+        });
 
       if (!fillResponse.ok) {
         const errorData = await fillResponse.json().catch(() => ({}));
@@ -588,27 +588,27 @@ export function WorkOrderForm({
         return;
       }
 
-      const fillData = await fillResponse.json();
-      const fillTime = Date.now() - fillStartTime;
-      console.log(`[Form] Pinecone fill completed in ${fillTime}ms`);
-      if (fillData.timings) {
-        console.log('[Form] API timings:', fillData.timings);
-      }
-      console.log('Pinecone fill response:', fillData);
-      
-      if (fillData.success && fillData.workOrder) {
-        console.log('Filling form with work order data:', fillData.workOrder);
-        
-        // Fill in the form fields directly
-        setFormData(prev => {
+          const fillData = await fillResponse.json();
+          const fillTime = Date.now() - fillStartTime;
+          console.log(`[Form] Pinecone fill completed in ${fillTime}ms`);
+          if (fillData.timings) {
+            console.log('[Form] API timings:', fillData.timings);
+          }
+          console.log('Pinecone fill response:', fillData);
+          
+          if (fillData.success && fillData.workOrder) {
+            console.log('Filling form with work order data:', fillData.workOrder);
+            
+            // Fill in the form fields directly
+            setFormData(prev => {
           const workOrder = fillData.workOrder;
           // Get machine info from MongoDB (already fetched above)
           const machineName = machineInfo?.machineName || machineId;
           const machineIdFromDB = machineInfo?._id || machineId;
           const machineDescription = machineInfo?.description || '';
           
-          const updated = {
-            ...prev,
+              const updated = {
+                ...prev,
             // Shopfloor Name - always use lab name from MongoDB
             companyName: shopfloorName || prev.companyName,
             
@@ -656,29 +656,29 @@ export function WorkOrderForm({
             machineType: prev.machineType, // Keep machine type
             alarmType: alarmToUse || prev.alarmType, // Update alarm type if found
             workCompleted: prev.workCompleted, // Keep work completed status
-          };
-          console.log('Updated form data:', updated);
-          return updated;
-        });
+              };
+              console.log('Updated form data:', updated);
+              return updated;
+            });
 
-        // Fill parts if available
-        if (fillData.workOrder.parts && fillData.workOrder.parts.length > 0) {
-          console.log('Setting parts:', fillData.workOrder.parts);
-          setParts(fillData.workOrder.parts);
-        }
+            // Fill parts if available
+            if (fillData.workOrder.parts && fillData.workOrder.parts.length > 0) {
+              console.log('Setting parts:', fillData.workOrder.parts);
+              setParts(fillData.workOrder.parts);
+            }
 
-        // Fill materials if available
-        if (fillData.workOrder.materials && fillData.workOrder.materials.length > 0) {
-          console.log('Setting materials:', fillData.workOrder.materials);
-          setMaterials(fillData.workOrder.materials);
-        }
+            // Fill materials if available
+            if (fillData.workOrder.materials && fillData.workOrder.materials.length > 0) {
+              console.log('Setting materials:', fillData.workOrder.materials);
+              setMaterials(fillData.workOrder.materials);
+            }
 
         const formattedAlarmName = formatAlarmName(alarmToUse || '');
-        setPineconeInfo(`Form filled for ${formattedAlarmName}`);
+            setPineconeInfo(`Form filled for ${formattedAlarmName}`);
         toast.success(`Work order form auto-filled for ${formattedAlarmName}`);
-      } else {
-        console.error('No work order data in response:', fillData);
-        setPineconeInfo(fillData.error || 'No maintenance information found in Pinecone for this alarm type.');
+          } else {
+            console.error('No work order data in response:', fillData);
+            setPineconeInfo(fillData.error || 'No maintenance information found in Pinecone for this alarm type.');
         toast.error(fillData.error || 'No maintenance information found in Pinecone for this alarm type.');
       }
     } catch (error: any) {
@@ -895,15 +895,15 @@ export function WorkOrderForm({
                 <span className="font-medium">Gathering Info...</span>
               </div>
             ) : (
-              <button
-                onClick={handleGetPineconeInfo}
+            <button
+              onClick={handleGetPineconeInfo}
                 disabled={!machineId}
                 className="px-4 py-2 rounded text-sm font-medium transition-all duration-300 flex items-center gap-2 bg-sage-500/20 hover:bg-sage-500/30 border border-sage-500/40 text-sage-400 hover:text-sage-300 disabled:opacity-30 disabled:cursor-not-allowed disabled:blur-[0.5px]"
-                title="AI Auto Fill - Automatically fill form fields from maintenance manual"
-              >
-                <AIIcon className="w-4 h-4" />
-                AI Auto Fill
-              </button>
+              title="AI Auto Fill - Automatically fill form fields from maintenance manual"
+            >
+                  <AIIcon className="w-4 h-4" />
+                  AI Auto Fill
+            </button>
             )}
             {alarmType && (
               <button

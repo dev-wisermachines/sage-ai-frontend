@@ -237,9 +237,9 @@ export async function getMachinesByLabId(labId: string): Promise<(Machine & { no
     } else {
       // If MAC already exists, prefer the one with more complete info
       const existing = macMap.get(mac)!;
-      macMap.set(mac, {
-        mac: mac,
-        nodeType: conn.nodeType || existing.nodeType || null,
+        macMap.set(mac, {
+          mac: mac,
+          nodeType: conn.nodeType || existing.nodeType || null,
         // Prefer sensorType from nodes collection
         sensorType: nodeData.sensorType || existing.sensorType || conn.sensorType || null,
         threshold: nodeData.threshold || existing.threshold || null,

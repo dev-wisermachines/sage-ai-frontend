@@ -397,14 +397,51 @@ export default function Dashboard() {
 
   // Fetch monitoring analysis
   const fetchMonitoringAnalysis = async () => {
-    if (!selectedMachineId || !downtimeData) {
+    if (!selectedMachineId || !downtimeData || !selectedLabId) {
+      console.log('[Monitoring Analysis] Missing required data:', {
+        selectedMachineId,
+        downtimeData: !!downtimeData,
+        selectedLabId
+      });
       return;
     }
     
     const machine = selectedMachine || machines.find(m => m._id === selectedMachineId);
     if (!machine) {
+      console.log('[Monitoring Analysis] Machine not found:', selectedMachineId);
       return;
     }
+
+    // Get lab name - ensure we have the correct lab
+    const selectedLab = labs.find(lab => lab._id === selectedLabId);
+    if (!selectedLab) {
+      console.log('[Monitoring Analysis] Lab not found:', selectedLabId, 'Available labs:', labs.map(l => ({ id: l._id, name: l.name })));
+      return;
+    }
+
+    const labName = selectedLab.name;
+    const machineName = machine.machineName;
+    
+    // Validate that we have valid names
+    if (!machineName || machineName === 'Unknown Machine') {
+      console.error('[Monitoring Analysis] Invalid machine name:', machineName, 'Machine object:', machine);
+      return;
+    }
+    
+    if (!labName || labName === 'Unknown Lab') {
+      console.error('[Monitoring Analysis] Invalid lab name:', labName, 'Lab object:', selectedLab);
+      return;
+    }
+    
+    // Log for debugging
+    console.log('[Monitoring Analysis] Sending data:', {
+      machineName,
+      machineId: selectedMachineId,
+      labName,
+      selectedLabId,
+      machineObject: machine,
+      labObject: selectedLab
+    });
 
     setLoadingMonitoringAnalysis(true);
     setMonitoringAnalysis(null);
@@ -434,8 +471,6 @@ export default function Dashboard() {
         return range;
       };
 
-      const selectedLab = labs.find(lab => lab._id === selectedLabId);
-
       // Check if vibration data is available
       const hasVibrationData = !isCNCMachineA && chartTab === 'vibration' && vibrationInfo?.hasData;
       const vibrationDataPoints = vibrationInfo?.dataPoints || 0;
@@ -460,9 +495,9 @@ export default function Dashboard() {
       };
 
       const requestBody = {
-        machineName: machine.machineName,
+        machineName: machineName,
         machineId: selectedMachineId,
-        labName: selectedLab?.name || 'Unknown Lab',
+        labName: labName,
         downtimePercentage: downtimeData.downtimePercentage || 0,
         uptimePercentage: downtimeData.uptimePercentage || 0,
         totalDowntime: downtimeData.totalDowntime || 0,

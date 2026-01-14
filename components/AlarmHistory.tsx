@@ -116,26 +116,26 @@ export function AlarmHistory({ machineId = 'machine-01', timeRange = '-24h', mac
               </span>
             </div>
           ) : (
-            <div className="space-y-3">
-              {alarms.map((alarm) => {
-                const count = data?.[alarm.field] || 0;
-                return (
-                  <div key={alarm.field} className="flex items-center justify-between p-3 bg-dark-bg/50 rounded border border-dark-border">
-                    <div className="flex items-center gap-3">
-                      <span className="text-dark-text font-medium">{alarm.label}</span>
-                      {count > 0 && (
-                        <WarningIcon className="w-3 h-3 text-red-400" />
-                      )}
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className={`text-lg font-bold ${count > 0 ? 'text-red-400' : 'text-sage-400'}`}>
-                        {count}
-                      </span>
-                      <span className="text-gray-500 text-sm">occurrences</span>
-                    </div>
+          <div className="space-y-3">
+            {alarms.map((alarm) => {
+              const count = data?.[alarm.field] || 0;
+              return (
+                <div key={alarm.field} className="flex items-center justify-between p-3 bg-dark-bg/50 rounded border border-dark-border">
+                  <div className="flex items-center gap-3">
+                    <span className="text-dark-text font-medium">{alarm.label}</span>
+                    {count > 0 && (
+                      <WarningIcon className="w-3 h-3 text-red-400" />
+                    )}
                   </div>
-                );
-              })}
+                  <div className="flex items-center gap-3">
+                    <span className={`text-lg font-bold ${count > 0 ? 'text-red-400' : 'text-sage-400'}`}>
+                      {count}
+                    </span>
+                    <span className="text-gray-500 text-sm">occurrences</span>
+                  </div>
+                </div>
+              );
+            })}
             </div>
           )}
         </>

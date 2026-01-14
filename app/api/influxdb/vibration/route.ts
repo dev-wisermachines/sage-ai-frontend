@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
       }
     } else {
       // For aggregated data, show requested time range ending at the latest data point
-      if (latestTime) {
+    if (latestTime) {
         stopTime = latestTime;
         startTime = new Date(latestTime.getTime() - milliseconds);
       } else {
@@ -130,15 +130,15 @@ export async function GET(request: NextRequest) {
       `;
     } else {
       fluxQuery = `
-        from(bucket: "${VIBRATION_BUCKET}")
+      from(bucket: "${VIBRATION_BUCKET}")
           |> range(start: ${startTimeStr}, stop: ${stopTimeStr})
-          |> filter(fn: (r) => r["_measurement"] == "Vibration")
-          |> filter(fn: (r) => exists r.machineId and r.machineId == "${machineId}")
-          |> filter(fn: (r) => r["_field"] == "${axis}")
-          |> aggregateWindow(every: ${windowPeriod}, fn: mean, createEmpty: false)
-          |> sort(columns: ["_time"])
-          |> limit(n: 10000)
-      `;
+        |> filter(fn: (r) => r["_measurement"] == "Vibration")
+        |> filter(fn: (r) => exists r.machineId and r.machineId == "${machineId}")
+        |> filter(fn: (r) => r["_field"] == "${axis}")
+        |> aggregateWindow(every: ${windowPeriod}, fn: mean, createEmpty: false)
+        |> sort(columns: ["_time"])
+        |> limit(n: 10000)
+    `;
     }
 
     console.log(`[Vibration API] Flux query: ${fluxQuery.substring(0, 200)}...`);

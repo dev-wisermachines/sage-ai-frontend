@@ -88,10 +88,35 @@ export async function POST(request: NextRequest) {
       additionalMetrics += `\n- Sensor Data: Monitoring ${data.chartType} (Modbus data)`;
     }
 
+    // Validate required fields
+    if (!data.machineName || data.machineName === 'Unknown Machine') {
+      console.error('[Monitoring Analysis API] Invalid machine name:', data.machineName);
+      return NextResponse.json(
+        { success: false, error: 'Invalid machine name provided' },
+        { status: 400 }
+      );
+    }
+    
+    if (!data.labName || data.labName === 'Unknown Lab') {
+      console.error('[Monitoring Analysis API] Invalid lab name:', data.labName);
+      return NextResponse.json(
+        { success: false, error: 'Invalid lab name provided' },
+        { status: 400 }
+      );
+    }
+
+    // Log the data being sent to OpenAI
+    console.log('[Monitoring Analysis API] Generating analysis for:', {
+      machineName: data.machineName,
+      machineId: data.machineId,
+      labName: data.labName,
+      timeRange: data.timeRange
+    });
+
     // Create a comprehensive prompt for OpenAI
     const prompt = `You are an industrial operations analyst providing a brief analysis of a specific machine's performance data.
 
-IMPORTANT: Start your analysis by clearly stating the machine name and lab name in the first sentence. Then include the key metrics (downtime percentage, uptime percentage, incident count) naturally within your analysis.
+CRITICAL: You MUST start your analysis by clearly stating the machine name and lab name in the first sentence. Use the exact names provided below.
 
 Machine Performance Data:
 - Machine Name: ${data.machineName}
@@ -132,7 +157,9 @@ Discuss the most important findings about:
 **Recommendations**
 Provide 1-2 actionable recommendations based on the current state.
 
-Use markdown formatting with **bold** for section headers. Keep each section concise (2-3 sentences). Make sure to explicitly mention the machine name "${data.machineName}" and lab name "${data.labName}" in your response.`;
+Use markdown formatting with **bold** for section headers. Keep each section concise (2-3 sentences). 
+
+IMPORTANT: You MUST explicitly mention the machine name "${data.machineName}" and lab name "${data.labName}" in your response, especially in the first sentence.`;
 
     // Create a streaming response
     const stream = new ReadableStream({
