@@ -132,7 +132,7 @@ export default function AlarmEventsPage() {
       const data = await response.json();
       setMachines(data.machines || []);
       // Don't auto-select machine - default to "All" (empty)
-      setSelectedMachineId('');
+        setSelectedMachineId('');
     } catch (error: any) {
       console.error('Error fetching machines:', error);
       toast.error('Failed to load machines');
@@ -361,16 +361,16 @@ export default function AlarmEventsPage() {
 
           {viewMode === 'alarms' ? (
             <>
-              <label className="text-gray-400">State:</label>
-              <select
-                value={selectedState}
-                onChange={(e) => setSelectedState(e.target.value)}
-                className="bg-dark-panel border border-dark-border rounded px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sage-500 focus:border-sage-500 min-w-[150px]"
-              >
-                <option value="">All</option>
-                <option value="RAISED">Raised</option>
-                <option value="CLEARED">Cleared</option>
-              </select>
+          <label className="text-gray-400">State:</label>
+          <select
+            value={selectedState}
+            onChange={(e) => setSelectedState(e.target.value)}
+            className="bg-dark-panel border border-dark-border rounded px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sage-500 focus:border-sage-500 min-w-[150px]"
+          >
+            <option value="">All</option>
+            <option value="RAISED">Raised</option>
+            <option value="CLEARED">Cleared</option>
+          </select>
             </>
           ) : (
             <>
@@ -518,95 +518,95 @@ export default function AlarmEventsPage() {
           </div>
         ) : (
           /* Alarm Events List */
-          <div className="w-full">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-                <span className="ml-3 text-gray-400">Loading events...</span>
-              </div>
-            ) : error ? (
-              <div className="p-8 bg-dark-panel border border-dark-border rounded text-center">
-                <p className="text-red-400">Error loading alarm events</p>
-              </div>
-            ) : filteredAlerts.length === 0 ? (
-              <div className="p-8 bg-dark-panel border border-dark-border rounded text-center">
-                <p className="text-gray-400">No events found</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {filteredAlerts.map((alert, idx) => {
-                  const alertKey = `${alert.timestamp}-${idx}`;
-                  const isExpanded = expandedAlerts.has(alertKey);
-                  return (
+        <div className="w-full">
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+              <span className="ml-3 text-gray-400">Loading events...</span>
+            </div>
+          ) : error ? (
+            <div className="p-8 bg-dark-panel border border-dark-border rounded text-center">
+              <p className="text-red-400">Error loading alarm events</p>
+            </div>
+          ) : filteredAlerts.length === 0 ? (
+            <div className="p-8 bg-dark-panel border border-dark-border rounded text-center">
+              <p className="text-gray-400">No events found</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredAlerts.map((alert, idx) => {
+                const alertKey = `${alert.timestamp}-${idx}`;
+                const isExpanded = expandedAlerts.has(alertKey);
+                return (
+                  <div
+                    key={alertKey}
+                    className="bg-dark-panel border border-dark-border rounded-lg hover:border-midnight-300 transition-colors"
+                  >
+                    {/* Header - Clickable */}
                     <div
-                      key={alertKey}
-                      className="bg-dark-panel border border-dark-border rounded-lg hover:border-midnight-300 transition-colors"
+                      className="p-6 cursor-pointer"
+                      onClick={() => toggleExpand(alert, alertKey)}
                     >
-                      {/* Header - Clickable */}
-                      <div
-                        className="p-6 cursor-pointer"
-                        onClick={() => toggleExpand(alert, alertKey)}
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              {isExpanded ? (
-                                <ChevronDownIcon className="w-4 h-4 text-gray-400" />
-                              ) : (
-                                <ChevronRightIcon className="w-4 h-4 text-gray-400" />
-                              )}
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            {isExpanded ? (
+                              <ChevronDownIcon className="w-4 h-4 text-gray-400" />
+                            ) : (
+                              <ChevronRightIcon className="w-4 h-4 text-gray-400" />
+                            )}
                               <h3 className="text-gray-300 font-semibold text-lg">
-                                {formatAlarmName(alert.alarm_type)}
-                              </h3>
-                              <span
-                                className={`px-2 py-1 rounded text-xs font-medium border ${
-                                  alert.state === 'RAISED'
-                                    ? 'bg-red-500/20 text-red-400 border-red-500/30'
-                                    : 'bg-sage-500/20 text-sage-400 border-sage-500/30'
-                                }`}
-                              >
-                                {alert.state}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-4 text-sm text-gray-400">
-                              <span>
-                                <span className="font-semibold text-gray-300">Machine:</span> {alert.machine_id}
-                              </span>
-                              <span>
-                                <span className="font-semibold text-gray-300">Alarm:</span> {formatAlarmName(alert.alarm_type)}
-                              </span>
-                            </div>
+                              {formatAlarmName(alert.alarm_type)}
+                            </h3>
+                            <span
+                              className={`px-2 py-1 rounded text-xs font-medium border ${
+                                alert.state === 'RAISED'
+                                  ? 'bg-red-500/20 text-red-400 border-red-500/30'
+                                  : 'bg-sage-500/20 text-sage-400 border-sage-500/30'
+                              }`}
+                            >
+                              {alert.state}
+                            </span>
                           </div>
-                          <div className="flex items-center gap-3">
-                            <div className="text-right text-sm text-gray-400">
-                              <div>
-                                {new Date(alert.timestamp).toLocaleDateString()} {new Date(alert.timestamp).toLocaleTimeString()}
-                              </div>
+                          <div className="flex items-center gap-4 text-sm text-gray-400">
+                            <span>
+                              <span className="font-semibold text-gray-300">Machine:</span> {alert.machine_id}
+                            </span>
+                            <span>
+                              <span className="font-semibold text-gray-300">Alarm:</span> {formatAlarmName(alert.alarm_type)}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="text-right text-sm text-gray-400">
+                            <div>
+                              {new Date(alert.timestamp).toLocaleDateString()} {new Date(alert.timestamp).toLocaleTimeString()}
                             </div>
                           </div>
                         </div>
                       </div>
-
-                      {/* Expanded Details - AI Analysis */}
-                      {isExpanded && (
-                        <div className="px-6 pb-6 pt-0 border-t border-dark-border">
-                          <div className="mt-4">
-                            <AlarmInstructions
-                              alarmType={alert.alarm_type}
-                              machineType={getMachineType(alert.machine_id)}
-                              state={alert.state}
-                              machineId={alert.machine_id}
-                              onClose={undefined}
-                            />
-                          </div>
-                        </div>
-                      )}
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+
+                    {/* Expanded Details - AI Analysis */}
+                    {isExpanded && (
+                      <div className="px-6 pb-6 pt-0 border-t border-dark-border">
+                        <div className="mt-4">
+                          <AlarmInstructions
+                            alarmType={alert.alarm_type}
+                            machineType={getMachineType(alert.machine_id)}
+                            state={alert.state}
+                            machineId={alert.machine_id}
+                            onClose={undefined}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
         )}
       </div>
     </div>
