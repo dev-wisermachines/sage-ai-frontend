@@ -5,7 +5,7 @@ import { TimeSeriesChart } from '@/components/TimeSeriesChart';
 import { AlarmHistory } from '@/components/AlarmHistory';
 import { WorkOrderForm } from '@/components/WorkOrderForm';
 import { RefreshIcon, SignalIcon, CalendarIcon, ChevronDownIcon, ChevronRightIcon, CheckIcon } from '@/components/Icons';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { VibrationChart } from '@/components/VibrationChart';
@@ -72,7 +72,8 @@ interface WorkOrder {
   materials: any[];
 }
 
-export default function Dashboard() {
+// Separate component that uses useSearchParams
+function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selectedLabId, setSelectedLabId] = useState<string>('');
@@ -971,3 +972,15 @@ export default function Dashboard() {
   );
 }
 
+// Main component with Suspense boundary
+export default function Dashboard() {
+  return (
+    <Suspense fallback={
+      <div className="bg-dark-bg text-dark-text p-6 min-h-screen flex items-center justify-center">
+        <div className="text-gray-400">Loading...</div>
+      </div>
+    }>
+      <DashboardContent />
+    </Suspense>
+  );
+}
